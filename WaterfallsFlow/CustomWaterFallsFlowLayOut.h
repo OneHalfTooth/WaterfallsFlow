@@ -37,5 +37,5 @@
 
 @interface CustomWaterFallsFlowLayOut : UICollectionViewLayout
 //初始化方法
-- (instancetype)initWithDelegate:(id<CustomWaterFallsFlowLayOutDelegate>)delegate;
+- (instancetype)initWithDelegate:(id<CustomWaterFallsFlowLayOutDelegate,UICollectionViewDataSource>)delegate;
 @end

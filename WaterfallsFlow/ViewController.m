@@ -25,6 +25,8 @@
     CustomWaterFallsFlowLayOut * layout = [[CustomWaterFallsFlowLayOut alloc]initWithDelegate:self];
     self.collectionView = [[UICollectionView alloc]initWithFrame:self.view.bounds collectionViewLayout:layout];
     [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"Identifier"];
+    [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"IdenFoot"];
+    [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"IdenHeader"];
 //    self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     self.collectionView.backgroundColor = [UIColor whiteColor];
@@ -38,7 +40,33 @@
     return 4;
 }
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
-    return nil;
+    UICollectionReusableView * temp;
+    UILabel * view = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100, 30)];
+    view.tag = 1111;
+    if ([UICollectionElementKindSectionHeader isEqualToString:kind]) {
+    temp = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"IdenHeader" forIndexPath:indexPath];
+        view.text = @"头";
+//        view.frame = CGRectMake(0, 0, 0, 0);
+        temp.backgroundColor = [UIColor blueColor];
+
+//        temp.backgroundColor = [UIColor yellowColor];
+        if (![temp viewWithTag:1111]) {
+            [temp addSubview:view];
+
+        }
+
+    }
+    else{
+    temp = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"IdenFoot" forIndexPath:indexPath];
+        temp.backgroundColor = [UIColor blueColor];
+        view.text = @"尾";
+        if (![temp viewWithTag:1111]) {
+            [temp addSubview:view];
+        }
+    }
+
+
+    return temp;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
@@ -62,6 +90,9 @@
 }
 
 
+-(UIEdgeInsets)edgeInsetsFromCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut{
+    return UIEdgeInsetsMake(64, 10, 0, 10);
+}
 
 //itme的height
 -(CGFloat)CustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut heightForItemAtIndexPath:(NSIndexPath *)indexPath{
@@ -73,6 +104,13 @@
 - (CGFloat)rowMarginFromCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut{
     return 10;
 }
+- (CGSize)collectionViewCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut referenceSizeForFooterInSection:(NSInteger)section{
+    return CGSizeMake(self.view.bounds.size.width, 30);
+}
+- (CGSize)collectionViewCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut referenceSizeForHeaderInSection:(NSInteger)section{
+    return CGSizeMake(self.view.bounds.size.width, 30);
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

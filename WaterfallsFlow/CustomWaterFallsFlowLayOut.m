@@ -56,17 +56,17 @@
     self.contentViewHeight = self.edgeInsets.top;
     /** 获取section 的个数 */
     for (NSInteger i = 0; i < [self.collectionView numberOfSections]; i ++) {
-        [self.attributesArray addObject: [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:i]]];
         /** 初始化行高 */
         [self customRemoveAllObjectsIndex:i];
+        [self.attributesArray addObject: [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:i]]];
         /** 获取每个section的itme个数 */
         for (NSInteger r = 0; r < [self.collectionView numberOfItemsInSection:i]; r ++) {
             NSIndexPath * indexPath = [NSIndexPath indexPathForItem:r inSection:i];
             NSLog(@"%ld,%ld",indexPath.section,indexPath.item);
             [self.attributesArray addObject:[self layoutAttributesForItemAtIndexPath:indexPath]];
         }
+        self.contentViewHeight = [self maxColumenesHeightFromIndex:i];
         [self.attributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:i]] ];
-    self.contentViewHeight = [self maxColumenesHeightFromIndex:i];
     }
 }
 
@@ -81,11 +81,16 @@
         size = [self headerSizeIndex:indexPath.section];
     }else{
         size = [self footerSizeIndex:indexPath.section];
+        viewOriY += self.rowMargin;
+        self.contentViewHeight = viewOriY;
     }
+
     self.contentViewHeight += size.height;
     UICollectionViewLayoutAttributes * attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:elementKind withIndexPath:indexPath];
     attributes.frame = CGRectMake(0, viewOriY, size.width, size.height);
-    [self changeAllHeightArray:self.contentViewHeight];
+    if ([self headerSizeIndex:indexPath.section].height != 0 || [self footerSizeIndex:indexPath.section].height != 0) {
+        [self changeAllHeightArray:self.contentViewHeight];
+    }
     return attributes;
 }
 
@@ -101,15 +106,15 @@
     NSInteger minColumensIndex = [self minColumnesHeightFromIndex:indexPath.section];
     CGFloat itemOriX = self.edgeInsets.left + (minColumensIndex * (self.columensMargin + itemWidth));
     CGFloat itemOriY = 0;
-    if (indexPath.section == 0) {
-        itemOriY = [[self.heightArray objectAtIndex:minColumensIndex] doubleValue] + self.edgeInsets.top;
-    }else{
+    if (itemOriY != self.edgeInsets.top + [self headerSizeIndex:indexPath.section].width) {
         itemOriY = [[self.heightArray objectAtIndex:minColumensIndex] doubleValue] + self.rowMargin;
+    }else{
+        itemOriY = [[self.heightArray objectAtIndex:minColumensIndex] doubleValue] + self.edgeInsets.top;
     }
-
     UICollectionViewLayoutAttributes * layoutAttribues = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
     NSLog(@"index = {%ld,%ld},itemHeight = %lf,itemOriY = %lf",indexPath.section,indexPath.item,itemHeight,itemOriY);
     layoutAttribues.frame = CGRectMake(itemOriX, itemOriY, itemWidth, itemHeight);
+
     /** 更新最大行高 */
     self.heightArray[minColumensIndex] = @(CGRectGetMaxY(layoutAttribues.frame));
     return layoutAttribues;
@@ -156,9 +161,11 @@
     if (index == 0) {
         [self.heightArray removeAllObjects];
         for (NSInteger i = 0; i < [self columnsByIndex:index]; i ++) {
-            [self.heightArray addObject:@(0)];
+            [self.heightArray addObject:@(self.edgeInsets.top)];
         }
-    }else{
+        return;
+    }
+    if ([self headerSizeIndex:index].height != 0 || [self footerSizeIndex:index].height != 0) {
         NSNumber * number = @([self maxColumenesHeightFromIndex:index]);
         [self.heightArray removeAllObjects];
         for (NSInteger i = 0; i < [self columnsByIndex:index]; i ++) {
@@ -220,7 +227,7 @@
 /** 获取section的头视图 */
 - (CGSize)headerSizeIndex:(NSInteger)index {
     if ([self.delegate respondsToSelector:@selector(collectionViewCustomWaterFallsFlowLayOut:referenceSizeForHeaderInSection:)]) {
-        [self.delegate collectionViewCustomWaterFallsFlowLayOut:self referenceSizeForHeaderInSection:index];
+        return [self.delegate collectionViewCustomWaterFallsFlowLayOut:self referenceSizeForHeaderInSection:index];
     }
     return CGSizeMake(0, 0);
 }
