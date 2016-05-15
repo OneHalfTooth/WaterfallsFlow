@@ -21,8 +21,6 @@
 @property (nonatomic,assign)CGFloat contentViewHeight;
 
 
-
-
 /** get获取上下左右间距 */
 - (UIEdgeInsets)edgeInsets;
 /** get获取列数 */
@@ -100,8 +98,12 @@
     /** 获取item的高 */
     CGFloat itemHeight = [self.delegate CustomWaterFallsFlowLayOut:self heightForItemAtIndexPath:indexPath];
     /** 获取item的宽 */
-    CGFloat itemWidth = (self.collectionView.bounds.size.width - self.edgeInsets.left - self.edgeInsets.right - self.columensMargin * ([self columnsByIndex:indexPath.section] - 1)) / [self columnsByIndex:indexPath.section];
-
+    CGFloat itemWidth = 0;
+    if ([self headerSizeIndex:indexPath.section].height != 0 || [self footerSizeIndex:indexPath.section].height != 0) {
+        itemWidth =  (self.collectionView.bounds.size.width - self.edgeInsets.left - self.edgeInsets.right - self.columensMargin * ([self columnsByIndex:indexPath.section] - 1)) / [self columnsByIndex:indexPath.section];
+    }else{
+        itemWidth =  (self.collectionView.bounds.size.width - self.edgeInsets.left - self.edgeInsets.right) / [self columnsByIndex:0];
+    }
     /** 获取行高最小的一列 */
     NSInteger minColumensIndex = [self minColumnesHeightFromIndex:indexPath.section];
     CGFloat itemOriX = self.edgeInsets.left + (minColumensIndex * (self.columensMargin + itemWidth));
@@ -137,7 +139,7 @@
 #pragma mark -- 获取最大行高
 - (CGFloat)maxColumenesHeightFromIndex:(NSInteger)index {
     CGFloat minColumensHeight = [[self.heightArray firstObject] doubleValue];
-    for (NSInteger i = 1; i < [self columnsByIndex:index]; i ++) {
+    for (NSInteger i = 1; i < self.heightArray.count; i ++) {
         if (minColumensHeight < [[self.heightArray objectAtIndex:i]doubleValue]) {
             minColumensHeight = [[self.heightArray objectAtIndex:i]doubleValue];
         }
@@ -148,7 +150,7 @@
 - (NSInteger)minColumnesHeightFromIndex:(NSInteger)index {
     NSInteger minColumensIndex = 0;
     CGFloat minColumensHeight = [[self.heightArray firstObject] doubleValue];
-    for (NSInteger i = 1; i < [self columnsByIndex:index]; i ++) {
+    for (NSInteger i = 1; i <self.heightArray.count; i ++) {
         if (minColumensHeight > [[self.heightArray objectAtIndex:i]doubleValue]) {
             minColumensHeight = [[self.heightArray objectAtIndex:i]doubleValue];
             minColumensIndex = i;

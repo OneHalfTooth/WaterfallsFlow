@@ -10,6 +10,12 @@
 #import "CustomWaterFallsFlowLayOut.h"
 
 
+
+//时候添加区头尾
+#define flag
+
+
+
 @interface ViewController ()<UICollectionViewDataSource,CustomWaterFallsFlowLayOutDelegate>
 
 /** collection */
@@ -37,8 +43,9 @@
 
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
-    return 4;
+    return 8;
 }
+#ifdef flag
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
     UICollectionReusableView * temp;
     UILabel * view = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100, 30)];
@@ -68,6 +75,8 @@
 
     return temp;
 }
+#else
+#endif
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     return 23;
@@ -101,16 +110,22 @@
 - (NSInteger)numberOfColumnsInCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut{
     return 2;
 }
+- (NSInteger)numberOfColumnsInSectionCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut columnsForItemAtIndex:(NSInteger)index{
+    NSArray * array = @[@(1),@(5),@(2),@(8),@(4),@(3),@(5),@(4),@(3),@(2)];
+    return [[array objectAtIndex:index]integerValue];
+}
 - (CGFloat)rowMarginFromCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut{
     return 10;
 }
+#ifdef flag
 - (CGSize)collectionViewCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut referenceSizeForFooterInSection:(NSInteger)section{
     return CGSizeMake(self.view.bounds.size.width, 30);
 }
 - (CGSize)collectionViewCustomWaterFallsFlowLayOut:(CustomWaterFallsFlowLayOut *)CustomWaterFallsFlowLayOut referenceSizeForHeaderInSection:(NSInteger)section{
     return CGSizeMake(self.view.bounds.size.width, 30);
 }
-
+#else
+#endif
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
